@@ -3,7 +3,7 @@ LABELS = {"Customer context", "How it works today", "Proposed direction", "Data 
           "Guardrails", "Success signals", "Deliverables"}
 PREFIXES = ("Type:", "Platform area:", "The ask:", "Business impact:", "Expected vs actual:",
             "How to reproduce:", "Reach and workaround:", "Existing customers:", "Backward compatibility:",
-            "Confident:", "To confirm:", "Partner docs:")
+            "Confident:", "To confirm:", "Pattern:", "Partner docs:")
 u16 = lambda s: len(s.encode("utf-16-le")) // 2
 pt = lambda n: {"magnitude": n, "unit": "PT"}
 raw = json.load(open(sys.argv[1]))
