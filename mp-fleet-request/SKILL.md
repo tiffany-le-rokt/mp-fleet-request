@@ -60,6 +60,18 @@ From the answer, confirm two things before going further:
 
 Then work through these areas.
 
+### Partner integrations: docs and data mapping
+If the request looks like a partner integration (a new or changed connection to a partner, destination or input, such as a new output, a kit, an event or audience feed, or a field mapping), do this before shaping the request:
+
+1. **Ask for partner docs.** "Do you have any partner documentation (API docs, integration guide, spec or sample payloads) I can use for technical context?" If they have none, carry on and note it as a blind spot.
+2. **Treat the docs as context, not the spec.** Do not assume the partner doc is the prescriptive guide for the build, and do not assume everything in it belongs in this request. Partner docs often cover endpoints, features and options this integration will not use. Ask the user which parts are in scope (for example which events, endpoints or features), and put the rest under Out of scope.
+3. **Map the data carefully.** If you can read the mParticle repo, compare the partner's fields with the data mParticle already has, and sort each field into one of two groups:
+   - **Confident mapping:** a clear, standard match you can see in both the repo and the partner doc. Typical examples are event timestamp, event ID, user identities (for example email, customer ID, device IDs), user attributes, and standard event attributes such as event name or commerce fields. Name the mParticle field and the partner field.
+   - **Needs confirmation:** anything with possible doubt, such as a similar name with a different meaning, a format or unit difference, a field with more than one possible source, custom attributes, hashing or consent requirements, or a required partner field with no obvious mParticle source.
+4. **Always ask when in doubt.** Show the user both groups in plain language and ask them to confirm or correct each "needs confirmation" item. Never guess a mapping. Anything they can't confirm goes under Blind Spots.
+
+If you can't read the repo, still ask for docs. Then ask the user what data should flow, and list any mapping as "to confirm" rather than inferring it.
+
 ### A. Problem and customer context (required)
 - Who is affected: which mParticle customers, partners, or internal teams? Name them if possible.
 - What happens today, and what goes wrong for them? Walk through the current experience.
@@ -142,6 +154,11 @@ Proposed direction:
 - [key behavior or change]
 - [key behavior or change]
 
+Data mapping:   (partner integrations only)
+- Confident: [mParticle field → partner field]
+- To confirm: [field and the open question]
+Partner docs: [link or name; "context only, not the build spec"]
+
 Out of scope:
 - [what this request does not cover]
 
@@ -163,7 +180,7 @@ Deliverables:
 - [team or domain, and what they may need to do or review]
 ```
 
-Leave out the "For bugs" block for feature requests. Then ask: "Does this capture it? Anything to change before we send it to Fleet?" Apply edits and re-show only the changed sections. Repeat until they approve.
+Leave out the "For bugs" block for feature requests, and the Data mapping block for requests that are not partner integrations. Only list a mapping as Confident if the user has seen it in the preview and not corrected it. Then ask: "Does this capture it? Anything to change before we send it to Fleet?" Apply edits and re-show only the changed sections. Repeat until they approve.
 
 ---
 
@@ -205,16 +222,17 @@ To build it:
 2. **Fill the text.** Send one Google Docs update with only `replaceAllText` requests (`matchCase: true`), one per placeholder:
    - `{{TITLE}}`, `{{REQUESTED_BY}}`, `{{DATE}}`: plain values.
    - `{{FLEET_ROOM}}`: the room name. If there is none, replace the full text ` | Fleet room: {{FLEET_ROOM}}` with an empty string instead.
-   - Section placeholders: the approved text, one paragraph per line, joined with `\n`. Bullets start with `•` followed by two spaces. Sub-labels sit on their own line with no colon: `Customer context`, `How it works today`, `Proposed direction`, `Out of scope`, `Guardrails`, `Success signals`, `Deliverables`. Inline labels start a line and end with a colon: `Type:`, `Platform area:`, `The ask:`, `Business impact:`, `Expected vs actual:`, `How to reproduce:`, `Reach and workaround:`, and inside Guardrails bullets `Existing customers:` and `Backward compatibility:`. Put `Type:` and `Platform area:` as the first two lines of `{{PROBLEM_STATEMENT}}`. Use no Markdown (`**`, `#`, `-`) anywhere.
+   - Section placeholders: the approved text, one paragraph per line, joined with `\n`. Bullets start with `•` followed by two spaces. Sub-labels sit on their own line with no colon: `Customer context`, `How it works today`, `Proposed direction`, `Data mapping`, `Out of scope`, `Guardrails`, `Success signals`, `Deliverables`. Inline labels start a line and end with a colon: `Type:`, `Platform area:`, `The ask:`, `Business impact:`, `Expected vs actual:`, `How to reproduce:`, `Reach and workaround:`, inside Guardrails bullets `Existing customers:` and `Backward compatibility:`, inside Data mapping bullets `Confident:` and `To confirm:`, and `Partner docs:` on its own line. Put `Type:` and `Platform area:` as the first two lines of `{{PROBLEM_STATEMENT}}`. Use no Markdown (`**`, `#`, `-`) anywhere.
    - `{{OTHER_TEAMS}}`: the teams or domains, or `None identified.`
 3. **Format labels and bullets.** Read the copy with the Google Docs read tool (the result is usually saved to a file). Save this script as `format_requests.py` and run it on the saved read to get the formatting batch and the revision ID:
 
 ```python
 import json, re, sys
-LABELS = {"Customer context", "How it works today", "Proposed direction", "Out of scope",
+LABELS = {"Customer context", "How it works today", "Proposed direction", "Data mapping", "Out of scope",
           "Guardrails", "Success signals", "Deliverables"}
 PREFIXES = ("Type:", "Platform area:", "The ask:", "Business impact:", "Expected vs actual:",
-            "How to reproduce:", "Reach and workaround:", "Existing customers:", "Backward compatibility:")
+            "How to reproduce:", "Reach and workaround:", "Existing customers:", "Backward compatibility:",
+            "Confident:", "To confirm:", "Partner docs:")
 u16 = lambda s: len(s.encode("utf-16-le")) // 2
 pt = lambda n: {"magnitude": n, "unit": "PT"}
 raw = json.load(open(sys.argv[1]))
@@ -260,6 +278,7 @@ If the Google Drive or Google Docs tools are not available, say which connector 
 ## Rules
 - Every request is for the mParticle platform. Do not draft requirements for other Rokt systems; redirect those kindly and only list them as other teams when they touch an mParticle request.
 - Problem Statement, Shaped Content and Measures of Success are required. Blind Spots is optional. Other Teams or Domains appears only when relevant.
+- For partner integrations, partner docs are context, not the build spec. Only include what the user puts in scope, and never guess a data mapping; ask.
 - Only write what the user told you or what you confirmed with them from the repo. If a section is thin, ask one more question rather than padding it.
 - Keep it simple and direct. No filler, no restating the same point in several sections.
 - Shaped Content gives direction, not a full technical spec, unless the change is small and straightforward.

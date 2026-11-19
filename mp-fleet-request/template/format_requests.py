@@ -1,8 +1,9 @@
 import json, re, sys
-LABELS = {"Customer context", "How it works today", "Proposed direction", "Out of scope",
+LABELS = {"Customer context", "How it works today", "Proposed direction", "Data mapping", "Out of scope",
           "Guardrails", "Success signals", "Deliverables"}
 PREFIXES = ("Type:", "Platform area:", "The ask:", "Business impact:", "Expected vs actual:",
-            "How to reproduce:", "Reach and workaround:", "Existing customers:", "Backward compatibility:")
+            "How to reproduce:", "Reach and workaround:", "Existing customers:", "Backward compatibility:",
+            "Confident:", "To confirm:", "Partner docs:")
 u16 = lambda s: len(s.encode("utf-16-le")) // 2
 pt = lambda n: {"magnitude": n, "unit": "PT"}
 raw = json.load(open(sys.argv[1]))
